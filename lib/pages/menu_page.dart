@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:sushi_book/components/button.dart';
-import 'package:sushi_book/models/food.dart';
 import 'package:sushi_book/theme/colors.dart';
 
 import '../components/food_tile.dart';
+import '../models/shop.dart';
+import 'food_details_page.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -14,37 +16,46 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  // food menu
-  List foodMenu = [
-    Food(
-      name: "Salmon Sushi",
-      price: "21",
-      imagePath: "lib/images/sushi.png",
-      rating: "4.9",
-    ),
-    Food(
-      name: "Tuna",
-      price: "23",
-      imagePath: "lib/images/tuna.png",
-      rating: "4.8",
-    ),
-  ];
+  // navigate to food item details
+  void navigateToFoodDetails(int index) {
+    // get the shop and it's menu
+    final shop = context.read<Shop>();
+    final foodMenu = shop.foodMenu;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FoodDetailsPage(
+          food: foodMenu[index],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    // get the shop and it's menu
+    final shop = context.read<Shop>();
+    final foodMenu = shop.foodMenu;
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        foregroundColor: Colors.grey[800],
         elevation: 0,
         leading: Icon(
           Icons.menu,
           color: Colors.grey[900],
         ),
-        title: Text(
+        title: const Text(
           'Tokyo',
-          style: TextStyle(color: Colors.grey[900]),
         ),
+        actions: [
+          // cart button
+          IconButton(onPressed: (){
+            Navigator.pushNamed(context, '/cartpage');
+          }, icon: const Icon(Icons.shopping_cart)),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,6 +145,7 @@ class _MenuPageState extends State<MenuPage> {
               itemCount: foodMenu.length,
               itemBuilder: (context, index) => FoodTile(
                 food: foodMenu[index],
+                onTap: () => navigateToFoodDetails(index),
               ),
             ),
           ),
@@ -152,37 +164,39 @@ class _MenuPageState extends State<MenuPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(children: [
-                  // image
-                  Image.asset(
-                    'lib/images/salmon_eggs.png',
-                    height: 60,
-                  ),
+                Row(
+                  children: [
+                    // image
+                    Image.asset(
+                      'lib/images/salmon_eggs.png',
+                      height: 60,
+                    ),
 
-                  const SizedBox(
-                    width: 20,
-                  ),
+                    const SizedBox(
+                      width: 20,
+                    ),
 
-                  // name and price
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //name
-                      Text(
-                        'Salmon Eggs',
-                        style: GoogleFonts.dmSerifDisplay(fontSize: 18),
-                      ),
+                    // name and price
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        //name
+                        Text(
+                          'Salmon Eggs',
+                          style: GoogleFonts.dmSerifDisplay(fontSize: 18),
+                        ),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        '\$21.00',
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    ],
-                  ),
-                ],),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          '\$21.00',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
 
                 // heart
                 const Icon(
